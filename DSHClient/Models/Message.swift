@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 struct ChatMessage: Identifiable, Codable {
     var id: UUID
@@ -44,8 +44,4 @@ enum MessageRole: String, Codable {
         case .system: return .orange
         }
     }
-}
-
-extension MessageRole {
-    typealias Color = SwiftUI.Color
 }

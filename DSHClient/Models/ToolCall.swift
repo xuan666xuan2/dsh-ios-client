@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 struct ToolCall: Identifiable, Codable {
     let id: String

@@ -28,6 +28,7 @@ jobs:
       
       - name: Build App (No Signing)
         run: |
+          set -o pipefail
           xcodebuild \
             -project DSHClient.xcodeproj \
             -scheme DSHClient \
@@ -39,11 +40,29 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
-            build
+            build 2>&1 | tee build.log
+          
+          BUILD_STATUS=$?
+          echo "Build exit code: $BUILD_STATUS"
+          
+          if [ $BUILD_STATUS -ne 0 ]; then
+            echo "❌ Build failed! Saving log..."
+            cp build.log build-error.log
+          fi
           
           APP_PATH=$(find build -name "*.app" -type d | head -1)
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
           echo "Found app at: $APP_PATH"
+      
+      - name: Upload Build Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: |
+            build.log
+            build-error.log
+          retention-days: 7
       
       - name: Package IPA
         run: |
